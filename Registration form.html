@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registration Form</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 500px;
+            margin: auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        h2 {
+            text-align: center;
+            color: #333;
+        }
+        label {
+            font-weight: bold;
+            display: block;
+            margin: 10px 0 5px;
+        }
+        input, select {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Registration Form</h2>
+        <form action="#" method="POST">
+            <!-- Name -->
+            <label for="name">Name <span style="color: red;">*</span></label>
+            <input type="text" id="name" name="name" placeholder="Enter your name" required>
+            
+            <!-- Email -->
+            <label for="email">Email ID <span style="color: red;">*</span></label>
+            <input type="email" id="email" name="email" placeholder="Enter your email" required>
+            
+            <!-- Phone Number -->
+            <label for="phone">Phone Number <span style="color: red;">*</span></label>
+            <input type="tel" id="phone" name="phone" placeholder="Enter your phone number" required>
+            
+            <!-- Location -->
+            <label for="location">Location <span style="color: red;">*</span></label>
+            <input type="text" id="location" name="location" placeholder="Enter your location" required>
+            
+            <!-- Course Selection -->
+            <label for="course">Select Course <span style="color: red;">*</span></label>
+            <select id="course" name="course" required onchange="updateBatchDates(); updateInstallmentOptions()">
+                <option value="">-- Choose a Course --</option>
+                <option value="HRG">HRG</option>
+                <option value="POSH">POSH</option>
+                <option value="CTAF">CTAF</option>
+                <option value="ODCM">ODCM</option>
+                <option value="EITC">EITC</option>
+                <option value="CPC">CPC</option>
+                <option value="CLTP">CLTP</option>
+                <option value="ACC">ACC</option>
+                <option value="PCC">PCC</option>
+            </select>
+
+            <!-- Batch Date -->
+            <label for="batch-date">Batch Date <span style="color: red;">*</span></label>
+            <select id="batch-date" name="batch-date" required>
+                <option value="">-- Select a Course First --</option>
+            </select>
+
+            <!-- Payment Method -->
+            <label for="payment-method">Payment Method <span style="color: red;">*</span></label>
+            <select id="payment-method" name="payment-method" required onchange="updatePaymentFields()">
+                <option value="">-- Choose Payment Method --</option>
+                <option value="one-time">One-time Payment</option>
+                <option value="installment">Installment Option</option>
+            </select>
+
+            <!-- Amount Paid (for one-time payment) -->
+            <div id="one-time-payment" style="display: none;">
+                <label for="amount-paid">Amount Paid <span style="color: red;">*</span></label>
+                <input type="number" id="amount-paid" name="amount-paid" placeholder="Enter the amount paid" required>
+            </div>
+
+            <!-- Installment Options (for installment payment) -->
+            <div id="installment-options" style="display: none;">
+                <label for="installments">Select Installment Plan <span style="color: red;">*</span></label>
+                <select id="installments" name="installments" required onchange="showNextInstallmentField()">
+                    <option value="">-- Select Number of Installments --</option>
+                    <option value="2">2 Installments</option>
+                </select>
+            </div>
+
+            <!-- Next Installment Date and Amount -->
+            <div id="next-installment" style="display: none;">
+                <label for="next-installment-date">Next Installment Date and Amount <span style="color: red;">*</span></label>
+                <input type="text" id="next-installment-date" name="next-installment-date" placeholder="Enter the date and amount for the next installment" required>
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit">Register</button>
+        </form>
+    </div>
+
+    <script>
+        // Batch dates based on selected course
+        const batchDates = {
+            HRG: ["29th December", "19th January", "2nd February"],
+            POSH: ["4th January - Weekend Batch", "22nd/23rd January - 2 Day Batch"],
+            CTAF: ["8th January", "1st February"],
+            ODCM: ["16th February"],
+            EITC: ["5th January"],
+            CPC: ["4th January"],
+            CLTP: ["16th January"],
+            ACC: ["March Batch"],
+            PCC: ["March Batch"]
+        };
+
+        // Function to update batch date options dynamically
+        function updateBatchDates() {
+            const courseSelect = document.getElementById("course");
+            const batchDateSelect = document.getElementById("batch-date");
+            const selectedCourse = courseSelect.value;
+
+            // Clear previous options
+            batchDateSelect.innerHTML = '<option value="">-- Select a Batch Date --</option>';
+
+            if (selectedCourse && batchDates[selectedCourse]) {
+                // Add new options based on the selected course
+                batchDates[selectedCourse].forEach(date => {
+                    const option = document.createElement("option");
+                    option.value = date;
+                    option.textContent = date;
+                    batchDateSelect.appendChild(option);
+                });
+            }
+        }
+
+        // Function to update installment options based on selected course
+        function updateInstallmentOptions() {
+            const courseSelect = document.getElementById("course");
+            const installmentsSelect = document.getElementById("installments");
+            const selectedCourse = courseSelect.value;
+
+            // Show 3 installments and 4 installments options for HRG, ACC, PCC
+            if (["HRG", "ACC", "PCC"].includes(selectedCourse)) {
+                installmentsSelect.innerHTML = '<option value="2">2 Installments</option><option value="3">3 Installments</option><option value="4">4 Installments</option>';
+            } else {
+                // Only show 2 installments for others
+                installmentsSelect.innerHTML = '<option value="2">2 Installments</option>';
+            }
+        }
+
+        // Function to show next installment field
+        function showNextInstallmentField() {
+            const installmentDiv = document.getElementById("installment-options");
+            const installmentsValue = document.getElementById("installments").value;
+            const nextInstallmentDiv = document.getElementById("next-installment");
+
+            if (installmentsValue) {
+                nextInstallmentDiv.style.display = "block"; // Show next installment date and amount field
+            } else {
+                nextInstallmentDiv.style.display = "none"; // Hide if no installments are selected
+            }
+        }
+
+        // Function to update payment-related fields based on the payment method selected
+        function updatePaymentFields() {
+            const paymentMethod = document.getElementById("payment-method").value;
+            const oneTimePaymentDiv = document.getElementById("one-time-payment");
+            const installmentDiv = document.getElementById("installment-options");
+            const nextInstallmentDiv = document.getElementById("next-installment");
+
+            // Hide all payment-related fields initially
+            oneTimePaymentDiv.style.display = "none";
+            installmentDiv.style.display = "none";
+            nextInstallmentDiv.style.display = "none"; // Hide next installment field
+
+            // Show relevant field based on the selected payment method
+            if (paymentMethod === "one-time") {
+                oneTimePaymentDiv.style.display = "block";
+            } else if (paymentMethod === "installment") {
+                installmentDiv.style.display = "block";
+                showNextInstallmentField(); // Show next installment field if installment is selected
+            }
+        }
+    </script>
+</body>
+</html>
